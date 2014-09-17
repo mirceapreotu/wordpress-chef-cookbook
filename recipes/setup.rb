@@ -1,12 +1,14 @@
 include_recipe "mysql::server"
 include_recipe "wordpress::#{ node['wordpress']['platform'] }_setup"
 
-execute "restart mysql - make sure it's running" do
-  user "root"
-  group "root"
+def restart_mysql
+  execute "restart mysql - make sure it's running" do
+    user "root"
+    group "root"
 
-  command "sudo service mysql restart"
-end
+    command "sudo service mysql restart"
+  end
+end  
 
 project_name   = node['wordpress']['name']
 files          = node['wordpress']['sources']['files']
@@ -42,6 +44,8 @@ template config_path do
   not_if { File.exists? config_path }
 end
 
+restart_mysql
+
 execute "create database" do
   user "root"
   group "root"
@@ -50,6 +54,7 @@ execute "create database" do
 
   command "mysql -u #{ config_options['db_user'] } -p\"#{ config_options['db_password'] }\" -e \"#{ statement }\";"
 end
+
 
 execute "import database from #{ database }" do
   user "root"
@@ -62,3 +67,5 @@ execute "import database from #{ database }" do
 
   command commands.join(' && ')
 end unless database.empty?
+
+restart_mysql
