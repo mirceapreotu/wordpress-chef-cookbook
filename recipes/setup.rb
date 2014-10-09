@@ -50,7 +50,7 @@ execute "create database" do
   user "root"
   group "root"
 
-  statement = "CREATE DATABASE #{ config_options['db_name'] } DEFAULT CHARACTER SET #{ config_options['db_charset'] };"
+  statement = "DROP DATABASE IF EXISTS #{ config_options['db_name'] } ; CREATE DATABASE #{ config_options['db_name'] } DEFAULT CHARACTER SET #{ config_options['db_charset'] };"
 
   command "mysql -u #{ config_options['db_user'] } -p\"#{ config_options['db_password'] }\" -e \"#{ statement }\";"
 end
